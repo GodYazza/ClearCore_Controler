@@ -60,3 +60,38 @@ def confrim_command(self):
 def __del__(self):
         serialDeviceConnection.disconnect(self,ClearCore_COMPORT)
         print('LCR Relay Board disconnected, presumably')
+
+def home(self):
+    home_success_flag = False
+    # This function should only be called once ClearCore is ready to receive a command
+        
+    print('Sending command to ClearCore that we want it to Home the Y axis\n')
+    self.comms.write(b"HomeY#") # Send command to ClearCore to Home Y axis
+    # Now we see if the command was successfully received
+    print('Confriming command by asking ClearCore what it\'s last command was.')
+    print('ClearCore responds...')
+    time.sleep(1)
+    echo_input = self.comms.readline() #Wait for ClearCore to confirm command
+    echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+    echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+    print(echo_input_str_strip)
+    print(' ')
+        
+    print('Waiting for ClearCore to Home Y axis mover')
+    time.sleep(1)
+    while (not home_success_flag):
+        echo_input = self.comms.readline() #Wait for ClearCore to confrim 'Home Y Axis has completed'
+        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+        if echo_input_str_strip == 'CLEARCORE: Home Y Axis has completed':
+            print('ClearCore responds...')
+            print(echo_input_str_strip)
+            print(' ')
+            home_success_flag = True
+                
+        if home_success_flag:
+            self.Global_Home_Sucess_Flag = True
+            return True
+        else:
+            self.Global_Home_Y_Sucess_Flag = False
+            return False   

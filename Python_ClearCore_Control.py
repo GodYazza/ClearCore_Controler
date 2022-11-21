@@ -14,6 +14,12 @@ ClearCore = deviceConnect.ClearCore_controller()
 success = ClearCore.ping_ClearCore()
 assert success == True, "Error with getting a successful ping to and from ClearCore"
 
+
+print("Homing Axis")
 success = ClearCore.home()
 assert success == True, "Error with Homing"
 
+#Moving forward X amount to check for clearance
+for x in range(5):
+    inRange = ClearCore.move()
+    

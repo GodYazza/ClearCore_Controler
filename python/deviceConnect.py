@@ -34,7 +34,7 @@ class ClearCore_controller(serialDeviceConnection):
         self.Global_Position = 0
 
         
-        serialDeviceConnection.connet(self, ClearCore_COMPORT, ClearCore_baudRate)
+        serialDeviceConnection.connect(self, ClearCore_COMPORT, ClearCore_baudRate)
         # Send a ping to the ClearCore Controller
         ping_success = -1
         ClearCore_connection_attempts = 1
@@ -101,12 +101,12 @@ def home_x(self):
                 self.Global_Home_Success_Flag = False
                 return False         
         
-def move_x_forward(self):
+def move_x_forward(self, forward_position):
         move_success_flag = False
         # This function should only be called once ClearCore is ready to receive a command and has been homed
         assert self.Global_Home_Sucess_Flag == True, "Error, can't move X axis without homing first" 
         print('Sending command to ClearCore that we want it to move the X axis\n')
-        self.comms.write(b"Move#") # Send command to ClearCore to Home Y axis
+        self.comms.write(b"MoveXForward#") # Send command to ClearCore to Home Y axis
         # Now we see if the command was successfully received
         print('Confriming command by asking ClearCore what it\'s last command was.')
         print('ClearCore responds...')
@@ -117,46 +117,29 @@ def move_x_forward(self):
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
         print(echo_input_str_strip)
         print(' ')
-        
-        # Requesting the movelength in mm
-        print('Waiting for ClearCore to request the move length from the user...')
-        print('ClearCore responds...')
-        # Should respond with "Requesting move length in mm"
+        time.sleep(1)
+        command_str = str(forward_position) + "#"
+        self.comms.write(bytes(command_str, 'utf-8')) # Send command to ClearCore to Home X axis
+        print('Waiting for ClearCore to execute move and respond with updated X position...')
         time.sleep(1)
         echo_input = self.comms.readline() #Wait for ClearCore to confirm command
         echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
         print(echo_input_str_strip)
         print(' ')
-
-        # Now we acutally get the user to input the move
-        value = 100
-                    
-        # We can now ask ClearCore to execute the move
-        print(' ')
-        print('Sending command to ClearCore containing postion of forward sensor\n')
-        command_str = str(value) + "#"
-        self.comms.write(bytes(command_str, 'utf-8')) 
-        print('Waiting for ClearCore to execute move and respond with updated Y position...')
-        time.sleep(1)
-        echo_input = self.comms.readline() #Wait for ClearCore to confirm command
-        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
-        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
-        print(echo_input_str_strip)
-        print(' ')
-        #Update Global_Y_Position in python control
-        self.Global_Position = value
+        #Update Global_X_Position in python control
+        self.Global_Position = forward_position
         print('Python Control confirms the position of the X axis mover in mm is currently: ' + str(self.Global_Position))
         print(' ')
         time.sleep(1)
         return True
 
-def reset_x(self):
+def move_x_home(self):
         move_success_flag = False
         # This function should only be called once ClearCore is ready to receive a command and has been homed
         assert self.Global_Home_Sucess_Flag == True, "Error, can't move X axis without homing first" 
         print('Sending command to ClearCore that we want it to move the X axis\n')
-        self.comms.write(b"Move#") # Send command to ClearCore to Home Y axis
+        self.comms.write(b"MoveXHome#") # Send command to ClearCore to Home Y axis
         # Now we see if the command was successfully received
         print('Confriming command by asking ClearCore what it\'s last command was.')
         print('ClearCore responds...')
@@ -167,37 +150,16 @@ def reset_x(self):
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
         print(echo_input_str_strip)
         print(' ')
+        print('Waiting of ClearCore to move to Forward Sensor')
+        while (not move_success_flag):
+            echo_input = self.comms.readline() #Wait for ClearCore to confrim 'Home X Axis has completed'
+            echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+            echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+            if echo_input_str_strip == 'CLEARCORE: Move To Home Complete':
+                print('ClearCore responds...')
+                print(echo_input_str_strip)
+                print(' ')
+                move_success_flag = True
         
-        # Requesting the movelength in mm
-        print('Waiting for ClearCore to request the move length from the user...')
-        print('ClearCore responds...')
-        # Should respond with "Requesting move length in mm"
-        time.sleep(1)
-        echo_input = self.comms.readline() #Wait for ClearCore to confirm command
-        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
-        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
-        print(echo_input_str_strip)
-        print(' ')
-
-        # Now we acutally get the user to input the move
-        value = 0
-                    
-        # We should now have a valid integer that is within range
-        # We can now ask ClearCore to execute the move
-        print(' ')
-        print('Sending command to ClearCore containing postion of Y axis mover\n')
-        command_str = str(value) + "#"
-        self.comms.write(bytes(command_str, 'utf-8')) 
-        print('Waiting for ClearCore to execute move and respond with updated Y position...')
-        time.sleep(1)
-        echo_input = self.comms.readline() #Wait for ClearCore to confirm command
-        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
-        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
-        print(echo_input_str_strip)
-        print(' ')
-        #Update Global_Y_Position in python control
-        self.Global_Position = value
-        print('Python Control confirms the position of the X axis mover is at home')
-        print(' ')
         time.sleep(1)
         return True

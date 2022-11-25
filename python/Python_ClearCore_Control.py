@@ -2,7 +2,7 @@ from ctypes import WinDLL
 from ctypes import c_int, c_float
 import time
 import deviceConnect
-
+forward_position = 100
 
 print(' ')
 print(' ')
@@ -18,6 +18,12 @@ print(' ')
 print(' ')
 print('*** Program Step 2 Homing to back sensor ***')
 print(' ')
+print(" ")
+print("Enter y to home")
+theInputText = "nope"
+theInputText = input(": ")
+while(theInputText != "y"):
+    theInputText = input(": ")
 print("Homing to back sensor")
 success = ClearCore.home()
 assert success == True, "Error with Homing"
@@ -32,10 +38,24 @@ print(' ')
 print('*** Program Step 3: Run Demo ***')
 print(' ')
 
-success = ClearCore.move_x_forward
+print(" ")
+print("Enter y to start demo")
+theInputText = "nope"
+theInputText = input(": ")
+while(theInputText != "y"):
+    theInputText = input(": ")
+
+success = ClearCore.move_x_forward(forward_position)
 assert success == True, "Error with moving the the forward sensor"
 
-success = ClearCore.reset_x
+print(" ")
+print("Enter y to move to home")
+theInputText = "nope"
+theInputText = input(": ")
+while(theInputText != "y"):
+    theInputText = input(": ")
+
+success = ClearCore.move_x_home()
 assert success == True, "Error with moving to home position"
     
 print(' ')

@@ -23,8 +23,8 @@ class serialDeviceConnection():
         print("serialDeviceConnection.printDevices() is Not implemented")
         
         
-#TEKNIK ClearCore Controller is COM6 connected to the right hand isde USB of my ASUS Laptop        
-ClearCore_COMPORT = "COM6"
+#TEKNIK ClearCore Controller is COM7 connected to the right hand isde USB of my ASUS Laptop        
+ClearCore_COMPORT = "COM7"
 ClearCore_baudRate = 9600
 class ClearCore_controller(serialDeviceConnection):
     
@@ -33,7 +33,11 @@ class ClearCore_controller(serialDeviceConnection):
         
         self.Global_Position = 0
 
-        
+        print(' ')
+        print('*********** ClearCore Controller Comms Intialization ***********')
+        print(' ')
+        print('ClearCore Controller: Trying to connect')
+
         serialDeviceConnection.connect(self, ClearCore_COMPORT, ClearCore_baudRate)
         # Send a ping to the ClearCore Controller
         ping_success = -1
@@ -52,7 +56,7 @@ class ClearCore_controller(serialDeviceConnection):
             ClearCore_connection_attempts += 1
             
     
-def confrim_command(self):
+    def confrim_command(self):
         print('Asking ClearCore what it\'s last instruction was.')
         print('ClearCore responds:')
         echo_input = self.comms.readline() #Wait for ClearCore to confirm command
@@ -62,11 +66,32 @@ def confrim_command(self):
         print('\n\n\n')    
         
     
-def __del__(self):
+    def __del__(self):
         serialDeviceConnection.disconnect(self,ClearCore_COMPORT)
         print('LCR Relay Board disconnected, presumably')
 
-def home_x(self):
+
+    def ping_ClearCore(self):
+        ping_success_flag = False
+        command_success_flag = False
+        while (not ping_success_flag):
+            self.comms.write(b"p") #Ping ClearCore
+            echo_input = self.comms.readline() #Wait for ClearCore to confirm ping
+            echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+            echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+            if echo_input_str_strip == 'CLEARCORE: Ping detected. Ready to receive command':
+                print('ClearCore responds...')
+                print(echo_input_str_strip)
+                print(' ')
+                ping_success_flag = True
+                
+            if ping_success_flag:
+                return True
+            else:
+                return False
+
+
+    def home_x(self):
         home_x_success_flag = False
         # This function should only be called once ClearCore is ready to receive a command
     
@@ -101,22 +126,34 @@ def home_x(self):
                 self.Global_Home_Success_Flag = False
                 return False         
         
-def move_x_forward(self, forward_position):
+    def move_x_forward(self, forward_position):
         move_success_flag = False
         # This function should only be called once ClearCore is ready to receive a command and has been homed
-        assert self.Global_Home_Sucess_Flag == True, "Error, can't move X axis without homing first" 
+        assert self.Global_Home_Success_Flag == True, "Error, can't move X axis without homing first" 
         print('Sending command to ClearCore that we want it to move the X axis\n')
         self.comms.write(b"MoveXForward#") # Send command to ClearCore to Home Y axis
         # Now we see if the command was successfully received
         print('Confriming command by asking ClearCore what it\'s last command was.')
         print('ClearCore responds...')
-        # Should respond with "Move#"
+        # Should respond with "MoveXForward#"
         time.sleep(1)
         echo_input = self.comms.readline() #Wait for ClearCore to confirm command
         echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
         print(echo_input_str_strip)
         print(' ')
+
+        # Requesting the movelength in mm
+        print('Waiting for ClearCore to request the automated X move length from Python Control...')
+        print('ClearCore responds...')
+        # Should respond with "Requesting X move length in mm"
+        time.sleep(1)
+        echo_input = self.comms.readline() #Wait for ClearCore to confirm command
+        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+        print(echo_input_str_strip)
+        print(' ')
+
         time.sleep(1)
         command_str = str(forward_position) + "#"
         self.comms.write(bytes(command_str, 'utf-8')) # Send command to ClearCore to Home X axis
@@ -134,10 +171,10 @@ def move_x_forward(self, forward_position):
         time.sleep(1)
         return True
 
-def move_x_home(self):
+    def move_x_home(self):
         move_success_flag = False
         # This function should only be called once ClearCore is ready to receive a command and has been homed
-        assert self.Global_Home_Sucess_Flag == True, "Error, can't move X axis without homing first" 
+        assert self.Global_Home_Success_Flag == True, "Error, can't move X axis without homing first" 
         print('Sending command to ClearCore that we want it to move the X axis\n')
         self.comms.write(b"MoveXHome#") # Send command to ClearCore to Home Y axis
         # Now we see if the command was successfully received
@@ -150,7 +187,7 @@ def move_x_home(self):
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
         print(echo_input_str_strip)
         print(' ')
-        print('Waiting of ClearCore to move to Forward Sensor')
+        print('Waiting of ClearCore to move to Home')
         while (not move_success_flag):
             echo_input = self.comms.readline() #Wait for ClearCore to confrim 'Home X Axis has completed'
             echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 

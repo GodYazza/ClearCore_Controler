@@ -54,7 +54,7 @@ int32_t global_X_axis_counts_per_mm = 200;  // 200 counts per motor revolution, 
 volatile uint8_t Homing_Flag_M0_X = 0;
 volatile uint8_t Forward_Sensor_Flag = 0;
 volatile uint8_t Back_Sensor_Flag = 0;
-volatile int32_t Home_Offset_M0_X = 10 * global_X_axis_counts_per_mm; // that means the offset is 10 mm
+volatile int32_t Home_Offset_M0_X = 50 * global_X_axis_counts_per_mm; // that means the offset is 50 mm
 
 int16_t global_ping_char = -1;
 uint8_t global_ready_to_receive_flag = 0;
@@ -128,8 +128,6 @@ void Move_to_Home_M0_X();
 void Homing_M0_X_DI7_ISR();
 void Neg_Limit_M0_X_DI7_ISR();
 void Pos_Limit_M0_X_DI6_ISR();
-void Moving_M0_X_DI7_ISR();
-void Moving_M0_X_DI6_ISR();
 
 // Emergency Stop ISR
 void Emergency_Stop_A10_ISR();
@@ -207,15 +205,17 @@ int main() {
 				// Python Control has requested a move in the X axis, now we need to tell it we want to know how much to move by in millimeters
 				/* 
 				*/
-				SerialPort.SendLine("CLEARCORE: Moving to Forward Sensor");
+				SerialPort.SendLine("CLEARCORE: Requesting X move length in mm");
 				/*
 				Recall that there are 500 motor counts per mm of X or Y axis movement.
 	
 				Assuming our range in mm for the X and Y axis are [0 975] and [0 475] respectively,
 				this means our range in counts for the X and Y axis are [0 487,500] and [0 237,500] respectively.
-	
+			
 				Python Control will always give a position in mm somewhere within these ranges.*/
-	
+				Serial_Comms_Get_Command_Move_X_Auto();
+				
+				
 				Move_to_Forward_M0_X();
 				//Assuming the move was successful, we now go back to the // AWAITING PING STATE
 				LED_IO_Indicators_OFF(); // 0000 (STATE 0)
@@ -862,16 +862,6 @@ void Homing_M0_X_DI7_ISR() {
 	Homing_Flag_M0_X = 1;
 }
 
-void Moving_M0_X_DI7_ISR(){
-	
-	motor_M0_X.MoveStopDecel(Homing_Acceleration_Limit_M0_X);
-	Delay_ms(1500);
-	Move_Distance_M0_X(0);
-	Back_Sensor_Flag = 1;
-	
-	
-}
-
 /*------------------------------------------------------------------------------
 	Neg_Limit_M0_X_DI7_ISR
 	
@@ -891,13 +881,6 @@ void Neg_Limit_M0_X_DI7_ISR() {
 	while(true) {}
 }
 
-void Moving_M0_X_DI6_ISR(){
-	motor_M0_X.MoveStopDecel(Homing_Acceleration_Limit_M0_X);
-	Delay_ms(1500);
-	Move_Distance_M0_X((motor_M0_X.PositionRefCommanded() - Home_Offset_M0_X));
-	Forward_Sensor_Flag = 1;
-	
-}
 
 
 /*------------------------------------------------------------------------------

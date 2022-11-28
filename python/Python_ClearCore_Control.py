@@ -16,12 +16,13 @@ assert success == True, "Error with getting a successful ping to and from ClearC
 theTextInput = "nope"
 
 while (theTextInput != "e"):
+    theTextInput = "nope"
     while ((theTextInput != "f") and (theTextInput != "h") and (theTextInput != "d") and (theTextInput != "r") and (theTextInput != "e")):
         print("Please enter the mode you would like")
         print('Enter "f" to enter Free Moving Mode')
         print('Enter "h" to home the rig')
         print('Enter "d" to enter Demo Mode')
-        print('Enter "h" to move to rig to Home Position')
+        print('Enter "r" to move to rig to Home Position')
         print('Enter "e" to escape program')
         theTextInput = input(":")
     print(" ")
@@ -78,7 +79,7 @@ while (theTextInput != "e"):
     
     elif theTextInput == "r":
         if ClearCore.Global_Home_Success_Flag == True:
-            if ClearCore.Global_Position == 0:
+            if ClearCore.Global_Position != 0:
                 print("Entering Demo Mode")
                 print('Enter "y" to reset Rig to home')
                 print('Enter "x" to reset')

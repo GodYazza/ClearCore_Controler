@@ -2,21 +2,23 @@ from ctypes import WinDLL
 from ctypes import c_int, c_float
 import time
 import deviceConnect
-forward_position = 2000
+forward_position = 2000 #Distance for the Rig to move forward in demo mode in MM
 
 print(' ')
 print(' ')
 print('*** Program Step 1: Open Communication Ports ***')
 print(' ')
+# Test code for ClearCore controller serial USB connection
 ClearCore = deviceConnect.ClearCore_controller()
 
-# Now we Home the X axis, don't forget we need to Ping the ClearCore controller first
-success = ClearCore.ping_ClearCore()
-assert success == True, "Error with getting a successful ping to and from ClearCore"
 theTextInput = "nope"
 
+#Connection has been secure, now allows user to select which 
+#state they want the ClearCore to operate in depending on their inputs
 while (theTextInput != "e"):
     theTextInput = "nope"
+    #While the input is not a selectable state, the script will ask which state
+    #the user would like the ClearCore in
     while ((theTextInput != "f") and (theTextInput != "h") and (theTextInput != "d") and (theTextInput != "r") and (theTextInput != "e")):
         print("Please enter the mode you would like")
         print('Enter "f" to enter Free Moving Mode')

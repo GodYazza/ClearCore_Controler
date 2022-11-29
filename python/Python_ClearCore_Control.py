@@ -5,11 +5,24 @@ import deviceConnect
 forward_position = 2000 #Distance for the Rig to move forward in demo mode in MM
 
 print(' ')
+print('*********** Main Program ***********')
+print(' ')
+print('Authors:')
+
+
+theTextInput = "Nope"
+while (theTextInput != ""):
+    theTextInput = input("Hit enter to start: ")
+
+print(' ')
 print(' ')
 print('*** Program Step 1: Open Communication Ports ***')
 print(' ')
-# Test code for ClearCore controller serial USB connection
+# Test code for ClearCore controller serial USB connection 
+# and establishes connection to the ClearCore
 ClearCore = deviceConnect.ClearCore_controller()
+success = ClearCore.ping_ClearCore()
+assert success == True, "Error with getting a successful ping to and from ClearCore" 
 
 theTextInput = "nope"
 
@@ -34,6 +47,7 @@ while (theTextInput != "e"):
         success = ClearCore.home_x()
  
     elif theTextInput == "h":
+        #Confirms the user wants to home the rig
         print('Enter "y" to home')
         print('Enter "x" to exit homing')
         theInputText = "nope"
@@ -41,8 +55,12 @@ while (theTextInput != "e"):
         while(theInputText != "y" and theInputText != "x"):
             theInputText = input(": ")
         if(theInputText == "y"):
+            #Checks that the rig has not been homed already
             if ClearCore.Global_Home_Success_Flag == False:
+                #All conditions past so rig will now home to the back sensor
                 print("Homing to back sensor")
+                success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
+                assert success == True, "Error with getting a successful ping to and from ClearCore"
                 success = ClearCore.home_x()
                 assert success == True, "Error with Homing"
 
@@ -58,7 +76,9 @@ while (theTextInput != "e"):
             print("Homing skipped")
         
     elif theTextInput == "d":
+        #First checks that the rig has been homed
         if ClearCore.Global_Home_Success_Flag == True:
+            #Confirms that the user wants to run the demo
             print("Entering Demo Mode")
             print('Enter "y" to start demo')
             print('Enter "x" to exit demo mode')
@@ -67,7 +87,8 @@ while (theTextInput != "e"):
             while(theInputText != "y" and theInputText != "x"):
                 theInputText = input(": ")
             if theInputText == "y":
-                success = ClearCore.ping_ClearCore()
+                #Now the rig will move to te specified point that is stored in variable forward_Position
+                success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
                 assert success == True, "Error with getting a successful ping to and from ClearCore"
                 success = ClearCore.move_x_forward(forward_position)
                 assert success == True, "Error with moving the the forward sensor"
@@ -80,17 +101,21 @@ while (theTextInput != "e"):
             print("Cannot enter Demo Mode as Rig has not been homed")
     
     elif theTextInput == "r":
+        #Checks the the ClearCore has been homed first
         if ClearCore.Global_Home_Success_Flag == True:
+            #Checks the position of the Rig is not already at home
             if ClearCore.Global_Position != 0:
+                #Confirms the user wants to move to home
                 print("Entering Demo Mode")
                 print('Enter "y" to reset Rig to home')
-                print('Enter "x" to reset')
+                print('Enter "x" to exit moving to home')
                 theInputText = "nope"
                 theInputText = input(": ")
                 while(theInputText != "y" and theInputText != "x"):
                     theInputText = input(": ")
                 if theInputText == "y":
-                    success = ClearCore.ping_ClearCore()
+                    #Now the ClearCore will move the rig to position 0 which is home
+                    success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
                     assert success == True, "Error with getting a successful ping to and from ClearCore"
                     success = ClearCore.move_x_home()
                     assert success == True, "Error with moving the the forward sensor"

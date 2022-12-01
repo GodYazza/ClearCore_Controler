@@ -23,7 +23,7 @@ class serialDeviceConnection():
         print("serialDeviceConnection.printDevices() is Not implemented")
         
         
-#TEKNIK ClearCore Controller is COM7 connected to the right hand isde USB of my ASUS Laptop        
+#TEKNIK ClearCore Controller is COM7 connected to the right handside USB of my ASUS Laptop        
 ClearCore_COMPORT = "COM7"
 ClearCore_baudRate = 9600
 class ClearCore_controller(serialDeviceConnection):
@@ -126,6 +126,8 @@ class ClearCore_controller(serialDeviceConnection):
                 self.Global_Home_Success_Flag = False
                 return False         
         
+
+
     def move_x_forward(self, forward_position):
         move_success_flag = False
         # This function should only be called once ClearCore is ready to receive a command and has been homed
@@ -198,5 +200,50 @@ class ClearCore_controller(serialDeviceConnection):
                 print(' ')
                 move_success_flag = True
         
+        time.sleep(1)
+        return True
+
+
+    def free_run(self):
+        free_run_status = True
+        print('Sending command to ClearCore that we want to enter free running mode\n')
+        self.comms.write(b"FreeRun#") # Send command to ClearCore to Home X axis
+        # Now we see if the command was successfully received
+        print('Confriming command by asking ClearCore what it\'s last command was.')
+        print('ClearCore responds...')
+        time.sleep(1)
+        echo_input = self.comms.readline() #Wait for ClearCore to confirm command
+        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+        print(echo_input_str_strip)
+        print(' ')
+        
+        time.sleep(1)
+        #Should respond with ClearCore is in Free Running Mode
+        echo_input = self.comms.readline() #Wait for ClearCore to confirm command
+        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+        print(echo_input_str_strip)
+        print(' ')
+
+        theTextInput = "Nope"
+        while ((theTextInput != "y") and (theTextInput != "n")):
+            print(' ')
+            print('Exit Free Running Mode?')
+            print(' ')
+            print('Enter \"y\" to exit')
+            theTextInput = input(": ")
+
+        self.comms.write(b"Exit#")
+        while (free_run_status):
+            echo_input = self.comms.readline() #Wait for ClearCore to confrim 'Home X Axis has completed'
+            echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+            echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+            if echo_input_str_strip == 'CLEARCORE: Free Run Finished':
+                print('ClearCore responds...')
+                print(echo_input_str_strip)
+                print(' ')
+                free_run_status = False
+                
         time.sleep(1)
         return True

@@ -21,8 +21,6 @@ print(' ')
 # Test code for ClearCore controller serial USB connection 
 # and establishes connection to the ClearCore
 ClearCore = deviceConnect.ClearCore_controller()
-success = ClearCore.ping_ClearCore()
-assert success == True, "Error with getting a successful ping to and from ClearCore" 
 
 theTextInput = "nope"
 
@@ -44,7 +42,10 @@ while (theTextInput != "e"):
 
     if theTextInput == "f":
         #do this
-        success = ClearCore.home_x()
+        success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
+        assert success == True, "Error with getting a successful ping to and from ClearCore"
+        success = ClearCore.free_run()
+        assert success == True, "Error with running Free Run mode"
  
     elif theTextInput == "h":
         #Confirms the user wants to home the rig

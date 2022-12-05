@@ -219,7 +219,7 @@ class ClearCore_controller(serialDeviceConnection):
         print(' ')
         
         time.sleep(1)
-        #Should respond with ClearCore is in Free Running Mode
+        #Should respond with ClearCore: Free Running Mode
         echo_input = self.comms.readline() #Wait for ClearCore to confirm command
         echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
@@ -239,7 +239,7 @@ class ClearCore_controller(serialDeviceConnection):
             echo_input = self.comms.readline() #Wait for ClearCore to confrim 'Home X Axis has completed'
             echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
             echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
-            if echo_input_str_strip == 'CLEARCORE: Free Run Finished':
+            if echo_input_str_strip == 'CLEARCORE: Free Running Complete':
                 print('ClearCore responds...')
                 print(echo_input_str_strip)
                 print(' ')

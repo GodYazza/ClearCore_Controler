@@ -2,7 +2,7 @@ from ctypes import WinDLL
 from ctypes import c_int, c_float
 import time
 import deviceConnect
-forward_position = 2000 #Distance for the Rig to move forward in demo mode in MM
+forward_position = 2400 #Distance for the Rig to move forward in demo mode in MM
 
 print(' ')
 print('*********** Main Program ***********')
@@ -36,7 +36,7 @@ while (theTextInput != "e"):
         print('Enter "h" to home the rig')
         print('Enter "d" to enter Demo Mode')
         print('Enter "r" to move to rig to Home Position')
-        print('Enter "e" to escape program')
+        print('Enter "e" to exit program')
         theTextInput = input(":")
     print(" ")
 
@@ -103,32 +103,31 @@ while (theTextInput != "e"):
     
     elif theTextInput == "r":
         #Checks the the ClearCore has been homed first
-        if ClearCore.Global_Home_Success_Flag == True:
-            #Checks the position of the Rig is not already at home
-            if ClearCore.Global_Position != 0:
-                #Confirms the user wants to move to home
-                print("Entering Demo Mode")
-                print('Enter "y" to reset Rig to home')
-                print('Enter "x" to exit moving to home')
-                theInputText = "nope"
-                theInputText = input(": ")
-                while(theInputText != "y" and theInputText != "x"):
-                    theInputText = input(": ")
-                if theInputText == "y":
-                    #Now the ClearCore will move the rig to position 0 which is home
-                    success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
-                    assert success == True, "Error with getting a successful ping to and from ClearCore"
-                    success = ClearCore.move_x_home()
-                    assert success == True, "Error with moving the the forward sensor"
-
-                else:
-                    print("Exiting reset")
-            
-            else:
-                print("Rig is already at home")
-
-        else:
+        if ClearCore.Global_Home_Success_Flag != True:
             print("Cannot reset to home as Rig has not been homed")
+            #Checks the position of the Rig is not already at home
+        elif ClearCore.Global_Position == 0:
+            print("Rig is already at home")
+            #Confirms the user wants to move to home
+        else:
+            print("Entering Demo Mode")
+            print('Enter "y" to reset Rig to home')
+            print('Enter "x" to exit moving to home')
+            theInputText = "nope"
+            theInputText = input(": ")
+            while(theInputText != "y" and theInputText != "x"):
+                theInputText = input(": ")
+            if theInputText == "y":
+                #Now the ClearCore will move the rig to position 0 which is home
+                success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
+                assert success == True, "Error with getting a successful ping to and from ClearCore"
+                success = ClearCore.move_x_home()
+                assert success == True, "Error with moving the the forward sensor"
+
+            else:
+                print("Exiting reset")
+            
+
 
 
 print(' ')

@@ -2,7 +2,11 @@ from ctypes import WinDLL
 from ctypes import c_int, c_float
 import time
 import deviceConnect
-forward_position = 2400 #Distance for the Rig to move forward in demo mode in MM
+forward_position = 3700 #Distance for the Rig to move forward in demo mode in MM
+#Setting the limits of the rig
+forward_max = 4000
+backward_max = 0
+
 
 print(' ')
 print('*********** Main Program ***********')
@@ -21,6 +25,12 @@ print(' ')
 # Test code for ClearCore controller serial USB connection 
 # and establishes connection to the ClearCore
 ClearCore = deviceConnect.ClearCore_controller()
+
+#If the demo position the user wants is out of range, keep asking for demo positions untill they choose a number in range
+while(forward_position < backward_max or forward_position > forward_max):
+    print("The demo position is out of range")
+    print("Please enter a position in range between " +str(backward_max) + "mm and " + str(forward_max) + "mm")
+    forward_position = int(input(":"))
 
 theTextInput = "nope"
 

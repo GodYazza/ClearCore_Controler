@@ -1,4 +1,3 @@
-from ctypes import WinDLL
 from ctypes import c_int, c_float
 import time
 import deviceConnect
@@ -11,7 +10,7 @@ backward_max = 0
 print(' ')
 print('*********** Main Program ***********')
 print(' ')
-print('Authors:')
+print('Authors: Yang Qian')
 
 
 theTextInput = "Nope"
@@ -20,7 +19,6 @@ while (theTextInput != ""):
 
 print(' ')
 print(' ')
-print('*** Program Step 1: Open Communication Ports ***')
 print(' ')
 # Test code for ClearCore controller serial USB connection 
 # and establishes connection to the ClearCore
@@ -41,8 +39,10 @@ while (theTextInput != "e"):
     #While the input is not a selectable state, the script will ask which state
     #the user would like the ClearCore in
     while ((theTextInput != "f") and (theTextInput != "h") and (theTextInput != "d") and (theTextInput != "r") and (theTextInput != "e")):
+        print('*********** Mode Select ***********')
+        print(' ')
         print("Please enter the mode you would like")
-        print('Enter "f" to enter Free Moving Mode')
+        print('Enter "f" to enter Free Run Mode')
         print('Enter "h" to home the rig')
         print('Enter "d" to enter Demo Mode')
         print('Enter "r" to move to rig to Home Position')

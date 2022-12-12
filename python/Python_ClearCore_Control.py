@@ -39,6 +39,8 @@ while (theTextInput != "e"):
     #While the input is not a selectable state, the script will ask which state
     #the user would like the ClearCore in
     while ((theTextInput != "f") and (theTextInput != "h") and (theTextInput != "d") and (theTextInput != "r") and (theTextInput != "e")):
+        print(' ')
+        print(' ')
         print('*********** Mode Select ***********')
         print(' ')
         print("Please enter the mode you would like")
@@ -88,7 +90,12 @@ while (theTextInput != "e"):
         
     elif theTextInput == "d":
         #First checks that the rig has been homed
-        if ClearCore.Global_Home_Success_Flag == True:
+        if ClearCore.Global_Home_Success_Flag == False:
+            print("Cannot enter Demo Mode as Rig has not been homed")
+            
+        elif ClearCore.Global_Position == forward_position:
+            print("Cannot enter Demo Mode as Rig is already at demo position")
+        else:
             #Confirms that the user wants to run the demo
             print("Entering Demo Mode")
             print('Enter "y" to start demo')
@@ -103,13 +110,8 @@ while (theTextInput != "e"):
                 assert success == True, "Error with getting a successful ping to and from ClearCore"
                 success = ClearCore.move_x_forward(forward_position)
                 assert success == True, "Error with moving the the forward sensor"
-
             else:
                 print("Exiting Demo Mode")
-
-
-        else:
-            print("Cannot enter Demo Mode as Rig has not been homed")
     
     elif theTextInput == "r":
         #Checks the the ClearCore has been homed first

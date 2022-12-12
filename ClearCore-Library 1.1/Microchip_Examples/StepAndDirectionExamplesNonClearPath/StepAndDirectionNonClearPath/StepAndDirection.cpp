@@ -1,6 +1,6 @@
 /*
 Title: Star_Destroyer_XYZ_Mover_Code_Mk1
-Author: Yang Qian
+Author: Patrick Lawton
 Version: Mk1.0
 Last Edit: 06/12/2022
 
@@ -104,10 +104,10 @@ int32_t Acceleration_Limit_M0_X = 50000; // pulses/counts per sec^2
 int32_t Homing_Velocity_Limit_M0_X = 6000; // pulses/counts per sec
 int32_t Homing_Acceleration_Limit_M0_X = 20000; // pulses/counts per sec^2
 
-int32_t Emergency_Stop_Accel = 50000;
+int32_t Emergency_Stop_Accel = 100000;
 
 // Define the stopping acceleration to be used when a limit switch is triggered
-int32_t Limit_Switch_Acceleration_M0_X = 50000; // pulses/counts per sec^2
+int32_t Limit_Switch_Acceleration_M0_X = 100000; // pulses/counts per sec^2
 
 //Define the Free Run velocity and acceleration limits to be used for each move
 int32_t Free_Run_Velocity_Limit_M0_X = 15000;
@@ -308,6 +308,8 @@ int main() {
 					Delay_ms(400);
 				}
 				SerialPort.SendLine("CLEARCORE: Free Running Complete");
+				int32_t CurerentPos = motor_M0_X.PositionRefCommanded() / global_counts_per_mm;
+				SerialPort.SendLine(-CurerentPos);
 				//Assuming the move was successful, we now go back to the // AWAITING PING STATE
 				LED_IO_Indicators_OFF(); // 0000 (STATE 0)
 			} 
@@ -463,8 +465,12 @@ void Serial_Comms_Get_Command_Move_X_Auto() {
 	// Now we need the value in counts, max value 1,000 mm * 500 counts per mm = 500,000 counts
 	int32_t Python_Move_Position_Counts = Python_Move_Position_mm * global_counts_per_mm;
 	// Now we tell it to move
-	Move_Distance_M0_X(Python_Move_Position_Counts - motor_M0_X.PositionRefCommanded());
+	motor_M0_X.VelMax(Velocity_Limit_M0_X);
+	motor_M0_X.AccelMax(Acceleration_Limit_M0_X);
+	Move_Distance_M0_X(Python_Move_Position_Counts + motor_M0_X.PositionRefCommanded());
 	// Erase the global command which would still be storing the last move position sent by Python Control
+	motor_M0_X.VelMax(Free_Run_Velocity_Limit_M0_X);
+	motor_M0_X.AccelMax(Free_Run_Acceleration_Limit_M0_X);
 	global_command_received_flag = -1; // Reset the flag and erase the command as we are about to execute the command
 	erase_global_python_command();
 	

@@ -201,6 +201,7 @@ class ClearCore_controller(serialDeviceConnection):
                 move_success_flag = True
         
         time.sleep(1)
+        self.Global_Position = 0
         return True
 
 
@@ -244,6 +245,11 @@ class ClearCore_controller(serialDeviceConnection):
                 print(echo_input_str_strip)
                 print(' ')
                 free_run_status = False
-                
+        echo_input = self.comms.readline() #Wait for ClearCore to confirm command
+        echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
+        echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
+        print("Current Position is " + echo_input_str_strip)
+        self.Global_Position = echo_input_str_strip
+
         time.sleep(1)
         return True

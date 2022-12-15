@@ -38,7 +38,7 @@ while (theTextInput != "e"):
     theTextInput = "nope"
     #While the input is not a selectable state, the script will ask which state
     #the user would like the ClearCore in
-    while ((theTextInput != "f") and (theTextInput != "h") and (theTextInput != "d") and (theTextInput != "r") and (theTextInput != "e")):
+    while ((theTextInput != "f") and (theTextInput != "h") and (theTextInput != "d") and (theTextInput != "m") and (theTextInput != "r") and (theTextInput != "e")):
         print(' ')
         print(' ')
         print('*********** Mode Select ***********')
@@ -47,6 +47,7 @@ while (theTextInput != "e"):
         print('Enter "f" to enter Free Run Mode')
         print('Enter "h" to home the rig')
         print('Enter "d" to enter Demo Mode')
+        print('Enter "m" to move rig to an input position')
         print('Enter "r" to move to rig to Home Position')
         print('Enter "e" to exit program')
         theTextInput = input(":")
@@ -108,7 +109,7 @@ while (theTextInput != "e"):
                 #Now the rig will move to te specified point that is stored in variable forward_Position
                 success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
                 assert success == True, "Error with getting a successful ping to and from ClearCore"
-                success = ClearCore.move_x_forward(forward_position)
+                success = ClearCore.move_x_demo(forward_position)
                 assert success == True, "Error with moving the the forward sensor"
             else:
                 print("Exiting Demo Mode")
@@ -138,6 +139,26 @@ while (theTextInput != "e"):
 
             else:
                 print("Exiting reset")
+    elif theTextInput == "m":
+        #First checks that the rig has been homed
+        move = -5
+        if ClearCore.Global_Home_Success_Flag == False:
+            print("Cannot enter move as Rig has not been homed")
+        else:
+            print("Move ClearCore to(mm): ")
+            move = int(input(": "))
+            while(move < backward_max or move > forward_max):
+                print("Invalid input or position entered is out of range")
+                print("Please enter a position in range between " +str(backward_max) + "mm and " + str(forward_max) + "mm")
+                move = int(input(": "))
+            
+            success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
+            assert success == True, "Error with getting a successful ping to and from ClearCore"
+            success = ClearCore.move_x(move)
+            assert success == True, "Error with moving the the forward sensor"
+            
+
+    
             
 
 

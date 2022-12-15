@@ -104,14 +104,14 @@ int32_t Acceleration_Limit_M0_X = 50000; // pulses/counts per sec^2
 int32_t Homing_Velocity_Limit_M0_X = 6000; // pulses/counts per sec
 int32_t Homing_Acceleration_Limit_M0_X = 20000; // pulses/counts per sec^2
 
-int32_t Emergency_Stop_Accel = 100000;
+int32_t Emergency_Stop_Accel = 150000;
 
 // Define the stopping acceleration to be used when a limit switch is triggered
-int32_t Limit_Switch_Acceleration_M0_X = 100000; // pulses/counts per sec^2
+int32_t Limit_Switch_Acceleration_M0_X = 150000; // pulses/counts per sec^2
 
 //Define the Free Run velocity and acceleration limits to be used for each move
-int32_t Free_Run_Velocity_Limit_M0_X = 15000;
-int32_t Free_Run_Acceleration_Limit_M0_X = 20000;
+int32_t Free_Run_Velocity_Limit_M0_X = 15000; //15000
+int32_t Free_Run_Acceleration_Limit_M0_X = 20000; //20000
 
 
 /************** FUNCTION PROTOTYPES **************/
@@ -148,7 +148,7 @@ void Emergency_Stop_A10_ISR();
 void erase_global_python_command();
 void Serial_Comms_Get_Command();
 void Serial_Comms_Get_Command_Move_X();
-void Serial_Comms_Get_Command_Move_X_Auto();
+void Serial_Comms_Get_Command_Move_X_Demo();
 void Serial_Comms_Get_Exit_Free_Run();
 void integer_into_global_python_command(int32_t position_counts);
 
@@ -209,7 +209,7 @@ int main() {
 				
 			}
 			
-			if (strcmp(global_python_command, "MoveXForward#") == 0) { // STATE 4: Moving X to Specified point at speed
+			if (strcmp(global_python_command, "MoveXDemo#") == 0) { // STATE 4: Moving X to Specified point at speed
 				IO0_OFF
 				IO1_OFF 
 				IO2_ON // 0010 (STATE 4)
@@ -224,7 +224,7 @@ int main() {
 	
 			
 				Python Control will always give a position in mm somewhere within these ranges.*/
-				Serial_Comms_Get_Command_Move_X_Auto();
+				Serial_Comms_Get_Command_Move_X_Demo();
 				
 				
 				//Assuming the move was successful, we now go back to the // AWAITING PING STATE
@@ -313,6 +313,27 @@ int main() {
 				//Assuming the move was successful, we now go back to the // AWAITING PING STATE
 				LED_IO_Indicators_OFF(); // 0000 (STATE 0)
 			} 
+			if (strcmp(global_python_command, "MoveX#") == 0) { // STATE 4: Moving X to Specified point at speed
+				IO0_ON
+				IO1_ON 
+				IO2_ON // 1110 (STATE 7)
+				global_command_received_flag = -1; // Reset the flag and erase the command as we are about to execute the command
+				erase_global_python_command();			
+				// Python Control has requested a move in the X axis, now we need to tell it we want to know how much to move by in millimeters
+				/* 
+				*/
+				SerialPort.SendLine("CLEARCORE: Requesting X move length in mm");
+				/*
+				Recall that there are 73 motor counts per mm of X axis movement.
+	
+			
+				Python Control will always give a position in mm somewhere within these ranges.*/
+				Serial_Comms_Get_Command_Move_X();
+				
+				
+				//Assuming the move was successful, we now go back to the // AWAITING PING STATE
+				LED_IO_Indicators_OFF(); // 0000 (STATE 0)
+			}
 			
 			
 			
@@ -378,9 +399,9 @@ Gets a command from the Python Control program that moves the GA mover X axis.
  
 This function should only be called once Python Control has successfully pinged ClearCore and ClearCore is ready
 to receive a command.
-
-It will not leave this function until "global_command_received_flag" = 1 and the Move_X function has been executed
 */
+
+
 void Serial_Comms_Get_Command_Move_X() {
 	int16_t char_waiting = -1; // Container used to pickup the next char in the Python Command message
 	uint8_t char_indexer = 0; 
@@ -412,7 +433,9 @@ void Serial_Comms_Get_Command_Move_X() {
 	// Now we need the value in counts, max value 1,000 mm * 500 counts per mm = 500,000 counts
 	int32_t Python_Move_Position_Counts = Python_Move_Position_mm * global_counts_per_mm;
 	// Now we tell it to move
-	Move_Distance_M0_X(Python_Move_Position_Counts - motor_M0_X.PositionRefCommanded());
+	motor_M0_X.VelMax(Free_Run_Velocity_Limit_M0_X);
+	motor_M0_X.AccelMax(Free_Run_Acceleration_Limit_M0_X);
+	Move_Distance_M0_X(Python_Move_Position_Counts + motor_M0_X.PositionRefCommanded());
 	// Erase the global command which would still be storing the last move position sent by Python Control
 	global_command_received_flag = -1; // Reset the flag and erase the command as we are about to execute the command
 	erase_global_python_command();
@@ -431,10 +454,7 @@ void Serial_Comms_Get_Command_Move_X() {
 
 
 
-
-
-
-void Serial_Comms_Get_Command_Move_X_Auto() {
+void Serial_Comms_Get_Command_Move_X_Demo() {
 	int16_t char_waiting = -1; // Container used to pickup the next char in the Python Command message
 	uint8_t char_indexer = 0; 
 

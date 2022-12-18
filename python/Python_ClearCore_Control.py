@@ -3,7 +3,7 @@ import time
 import deviceConnect
 forward_position = 3700 #Distance for the Rig to move forward in demo mode in MM
 #Setting the limits of the rig
-forward_max = 4000
+forward_max = 3950
 backward_max = 0
 
 
@@ -54,7 +54,8 @@ while (theTextInput != "e"):
     print(" ")
 
     if theTextInput == "f":
-        #do this
+        #Enters Free Running Mode
+        print("Entering Free Running Mode")
         success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
         assert success == True, "Error with getting a successful ping to and from ClearCore"
         success = ClearCore.free_run()
@@ -139,14 +140,14 @@ while (theTextInput != "e"):
 
             else:
                 print("Exiting reset")
-                
+
     elif theTextInput == "m":
         #First checks that the rig has been homed
         move = -5
         if ClearCore.Global_Home_Success_Flag == False:
             print("Cannot enter move as Rig has not been homed")
         else:
-            print("Move ClearCore to in mm: ")
+            print("Move ClearCore to in mm between(" + str(backward_max) + "mm to " + str(forward_max) +"mm):")
             #Asks for input position and will keep asking untill valid position is given
             move = int(input(": "))
             while(move < backward_max or move > forward_max):

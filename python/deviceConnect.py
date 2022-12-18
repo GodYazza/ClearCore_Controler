@@ -247,7 +247,8 @@ class ClearCore_controller(serialDeviceConnection):
         echo_input = self.comms.readline() #Wait for ClearCore to confirm command
         echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
-        print("Current Position is " + echo_input_str_strip)
+        if(self.Global_Home_Success_Flag == True):
+            print("Current Position is " + echo_input_str_strip)
         self.Global_Position = echo_input_str_strip
 
         time.sleep(1)

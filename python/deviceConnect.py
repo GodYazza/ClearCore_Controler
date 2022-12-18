@@ -288,11 +288,12 @@ class ClearCore_controller(serialDeviceConnection):
         echo_input = self.comms.readline() #Wait for ClearCore to confirm command
         echo_input_str = echo_input.decode("utf-8") # Decodes from b'string' or bytes type, to string type 
         echo_input_str_strip = echo_input_str.rstrip('\r\n')# Removes \n and \r from the recived string
-        print(echo_input_str_strip)
-        print(' ')
-        #Update Global_X_Position in python control
-        self.Global_Position = forward_position
-        print('Python Control confirms the position of the X axis mover in mm is currently: ' + str(self.Global_Position))
-        print(' ')
+        if(self.Global_Home_Success_Flag == True):
+            print(echo_input_str_strip)
+            print(' ')
+            #Update Global_X_Position in python control
+            self.Global_Position = forward_position
+            print('Python Control confirms the position of the X axis mover in mm is currently: ' + str(self.Global_Position))
+            print(' ')
         time.sleep(1)
         return True

@@ -13,7 +13,7 @@ operated by the file: StarDestroyerCode\64-Bit\Automated_IPT_Python_Control.py
 The code was built using an example project provided by TEKNIC which demonstrated the code required
 to command a non-TEKNIC servo motor driver (like those on the X and Y axis movers) using the TEKNIC 
 ClearCore controller.
-
+6
 Links to original example code (Microchip_Examples\StepAndDirectionExamplesNonClearPath\StepAndDirectionNonClearPath):
 ClearCore Documentation: https://teknic-inc.github.io/ClearCore-library/
 ClearCore Manual: https://www.teknic.com/files/downloads/clearcore_user_manual.pdf

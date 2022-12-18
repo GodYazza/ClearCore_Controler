@@ -139,23 +139,29 @@ while (theTextInput != "e"):
 
             else:
                 print("Exiting reset")
+                
     elif theTextInput == "m":
         #First checks that the rig has been homed
         move = -5
         if ClearCore.Global_Home_Success_Flag == False:
             print("Cannot enter move as Rig has not been homed")
         else:
-            print("Move ClearCore to(mm): ")
+            print("Move ClearCore to in mm: ")
+            #Asks for input position and will keep asking untill valid position is given
             move = int(input(": "))
             while(move < backward_max or move > forward_max):
                 print("Invalid input or position entered is out of range")
                 print("Please enter a position in range between " +str(backward_max) + "mm and " + str(forward_max) + "mm")
                 move = int(input(": "))
-            
-            success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
-            assert success == True, "Error with getting a successful ping to and from ClearCore"
-            success = ClearCore.move_x(move)
-            assert success == True, "Error with moving the the forward sensor"
+            #Checks if the ClearCore is already at the input position
+            if(move == ClearCore.Global_Position):
+                print("Rig is already at position " + move +"mm")
+            else:
+                #All conditions pass and move the Rig
+                success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input
+                assert success == True, "Error with getting a successful ping to and from ClearCore"
+                success = ClearCore.move_x(move)
+                assert success == True, "Error with moving the the forward sensor"
             
 
     

@@ -156,7 +156,7 @@ while (theTextInput != "e"):
                 move = int(input(": "))
             #Checks if the ClearCore is already at the input position
             if(move == ClearCore.Global_Position):
-                print("Rig is already at position " + move +"mm")
+                print("Rig is already at position " + str(move) +"mm")
             else:
                 #All conditions pass and move the Rig
                 success = ClearCore.ping_ClearCore()#Ping the ClearCore to allow it to accept input

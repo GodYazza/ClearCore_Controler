@@ -163,7 +163,8 @@ while (theTextInput != "e"):
                 assert success == True, "Error with getting a successful ping to and from ClearCore"
                 success = ClearCore.move_x(move)
                 assert success == True, "Error with moving the the forward sensor"
-            
+    
+    time.sleep(1)
 
     
             

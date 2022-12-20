@@ -1,0 +1,33 @@
+Title:  Instructions for code.
+Author: Yang Qian
+Date:   21/12/22
+
+Notes:
+If you want to use this program through the Raspberry Pi, you will need to change the coms port in deviceConnect to that of the Raspberry Pi, you can use pyserial through
+the command line to find which port the ClearCore is connected to, or use the coms port stored in the notes on the Raspberry Pi, which is for the top right usb port on 
+the Raspberry Pi
+
+
+************************************************************************************************
+Name:     StepAndDirectionExamplesNonClearPath.atsln_Mk1.cppproj (Atmel Studio Project)
+File path:  ClearCore_Controler\ClearCore-Library 1.1\Microchip_Examples\StepAndDirectionExamplesNonClearPath
+
+This the C code that runs on the ClearCore controller that allows the python to communicate and command the motors through reading and writing between them.
+
+
+
+************************************************************************************************
+Name:       Python_ClearCore_Control.py
+File path:  ClearCore_Controler\python
+Description:
+Python program which acts as controller for the rig.
+
+
+
+
+************************************************************************************************
+Name:    deviceConnect.py
+File path:  ClearCore_Controler\python
+Description:
+Python program which contains all the different functions that  will be called by the Python_ClearCore_Control.py to control the Rig
+
